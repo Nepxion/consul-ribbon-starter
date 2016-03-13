@@ -51,7 +51,7 @@ public class ConsulRibbonTests {
     Assert.assertNotNull(forecast.getName());
   }
   @Test
-  public void forecastWithZoneBalancingTarget() {
+  public void forecastWithFactory() {
 
    
     FeignRibbonClientFactory clientFactory=new FeignRibbonClientFactory(OPEN_WEATHER_SERVICE_ID);
