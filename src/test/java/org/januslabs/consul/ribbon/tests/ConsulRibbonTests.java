@@ -53,13 +53,24 @@ public class ConsulRibbonTests {
   @Test
   public void forecastWithFactory() {
 
-   
     FeignRibbonClientFactory clientFactory=new FeignRibbonClientFactory(OPEN_WEATHER_SERVICE_ID);
-    MyForecastClient mytest=clientFactory.wrap(MyForecastClient.class, OPEN_WEATHER_SERVICE_ID);
+    MyForecastClient mytest=clientFactory.target(MyForecastClient.class, OPEN_WEATHER_SERVICE_ID);
     Map<String, Object> params = new ConcurrentHashMap<String, Object>();
     params.put("zip", "66213,us");
     params.put("appid", "dd52e802c71658150b59247afaa77958");
 
+    Forecast forecast=mytest.currentForecast(params);
+    Assert.assertNotNull(forecast.getName());
+  }
+  
+  @Test
+  public void forecastWithFactoryLB() {
+
+    MyForecastClient mytest=FeignRibbonClientFactory.loadbalanceTarget(MyForecastClient.class, OPEN_WEATHER_SERVICE_ID);
+    Map<String, Object> params = new ConcurrentHashMap<String, Object>();
+    params.put("zip", "66213,us");
+    params.put("appid", "dd52e802c71658150b59247afaa77958");
+    params.put("units", "imperial");
     Forecast forecast=mytest.currentForecast(params);
     Assert.assertNotNull(forecast.getName());
   }

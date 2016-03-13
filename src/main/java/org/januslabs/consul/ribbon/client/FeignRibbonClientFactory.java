@@ -22,13 +22,20 @@ public class FeignRibbonClientFactory {
         new ConsulRibbonLoadBalancer(new ConsulServerListBuilder()).build(openWeatherServiceId);
   }
 
-  public   <T> T wrap(Class<T> type, String servicename) {
+  public   <T> T target(Class<T> type, String servicename) {
 
     return HystrixFeign.builder().logger(new Slf4jLogger()).retryer(new Retryer.Default())
         .logLevel(Logger.Level.FULL).decoder(new JacksonDecoder())
         .target(type, loadbalance(servicename).getHostPort());
   }
 
+  public static  <T> T loadbalanceTarget(Class<T> type, String servicename) {
+
+    return HystrixFeign.builder().logger(new Slf4jLogger()).retryer(new Retryer.Default())
+        .logLevel(Logger.Level.FULL).decoder(new JacksonDecoder())
+        .target(ZoneAwareBalancingTarget.create(type, servicename));
+  }
+  
   private  Server loadbalance(String key) {
     final Server server = loadbalancer.chooseServer(key);
     if (server == null) {
