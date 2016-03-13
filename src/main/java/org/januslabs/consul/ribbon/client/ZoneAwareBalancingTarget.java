@@ -15,6 +15,7 @@ import feign.Request;
 import feign.RequestTemplate;
 import feign.Target;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class ZoneAwareBalancingTarget<T> implements Target<T> {
 
@@ -26,8 +27,9 @@ public class ZoneAwareBalancingTarget<T> implements Target<T> {
   protected ZoneAwareBalancingTarget(Class<T> type, String scheme) {
     this.type = checkNotNull(type, "type");
     this.scheme = checkNotNull(scheme, "scheme");
-    this.name =  URI.create(scheme).getHost();
-    this.lb = AbstractLoadBalancer.class.cast(new ConsulRibbonLoadBalancer(new ConsulServerListBuilder()).build(scheme));
+    this.name = URI.create(scheme).getHost();
+    this.lb = AbstractLoadBalancer.class
+        .cast(new ConsulRibbonLoadBalancer(new ConsulServerListBuilder()).build(scheme));
   }
 
   @Override
@@ -50,7 +52,7 @@ public class ZoneAwareBalancingTarget<T> implements Target<T> {
     Server currentServer = lb.chooseServer(scheme);
     log.info("RequestTemplate input {}", input.url());
     log.info("Current server {}", currentServer);
-    String url = format("%s",  currentServer.getHostPort());
+    String url = format("%s", currentServer.getHostPort());
     input.insert(0, url);
     log.info("RequestTemplate input after loadbalancer lookup {}", input.url());
     try {
